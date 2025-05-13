@@ -1,12 +1,14 @@
-import logo from './logo.svg';
+
 import './App.css';
+import ImageUpload from './ImageUpload';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-      </header>
+    <div>
+      <h1 style={{ marginTop: '10px', textAlign: 'center' }}>
+        Inteligentna Etykieta
+      </h1>
+      <ImageUpload />
     </div>
   );
 }
