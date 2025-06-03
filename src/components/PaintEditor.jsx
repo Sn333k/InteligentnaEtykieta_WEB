@@ -26,7 +26,8 @@ export default function PaintEditor({ onSend }) {
   };
 
   return (
-      <div>
+      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center" }}>
+
         <canvas
           ref={canvasRef}
           width={200}
@@ -41,7 +42,7 @@ export default function PaintEditor({ onSend }) {
         />
         <div>
           <button onClick={clear}>Wyczyść</button>
-          <button onClick={send}>Wyślij</button>
+          <button onClick={send}><span>Wyślij</span></button>
         </div>
       </div>
   );

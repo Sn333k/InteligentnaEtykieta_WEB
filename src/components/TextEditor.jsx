@@ -47,7 +47,7 @@ export default function TextEditor({ onSend }) {
             boxSizing: "border-box",
           }}
         />
-        <button onClick={send}>Wyślij</button>
+        <button onClick={send}><span>Wyślij</span></button>
       </div>
   );
 }
