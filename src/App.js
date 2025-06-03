@@ -10,11 +10,10 @@ function convertCanvasToBlob(canvas) {
 
 function App() {
   const [imageFile, setImageFile] = useState(null);
-  const [status, setStatus] = useState("");
   const paintCanvasRef = useRef(null);
   const [text, setText] = useState("");
   const [fontSize, setFontSize] = useState(16);
-
+  const [uploadProgress, setUploadProgress] = useState(null);
   const isDrawing = useRef(false);
 
   const draw = (clientX, clientY) => {
@@ -45,24 +44,54 @@ function App() {
     ctx.clearRect(0, 0, 200, 200);
   };
 
+  // === Wspólna logika wysyłania ===
   const sendBlob = async (blob) => {
-    setStatus("Przetwarzanie...");
-    try {
-      const pbmBlob = await generatePBM_P4(blob);
-      const formData = new FormData();
-      formData.append("image", new File([pbmBlob], "image.pbm"));
+  //setStatus("Przetwarzanie...");
+  setUploadProgress({ percent: 0, error: false }); // pokaż okno z postępem
+  try {
+    const pbmBlob = await generatePBM_P4(blob);
+    const formData = new FormData();
+    formData.append("image", new File([pbmBlob], "image.pbm"));
 
-      const response = await fetch("http://192.168.4.1/upload", {
-        method: "POST",
-        body: formData,
-      });
+    // XMLHttpRequest pozwala śledzić postęp
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://192.168.4.1/upload");
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          setUploadProgress({ percent, error: false });
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          //setStatus("Obraz PBM wysłany!");
+          setUploadProgress({ percent: 100, error: false });
+          setTimeout(() => setUploadProgress(null), 1500);
+          resolve();
+        } else {
+          //setStatus("Błąd podczas wysyłania.");
+          setUploadProgress(null);
+          setUploadProgress({ error: true });
+          reject(new Error("Upload error"));
+        }
+      };
+      xhr.onerror = () => {
+        //setStatus("Błąd podczas wysyłania.");
+        setUploadProgress(null);
+        setUploadProgress({ error: true });
+        reject(new Error("Network error"));
+      };
+      xhr.send(formData);
+    });
+  } catch (err) {
+    console.error(err);
+    //setStatus("Błąd podczas przetwarzania.");
+    setUploadProgress(null);
+    setUploadProgress({ error: true });
+  }
+};
 
-      setStatus(response.ok ? "Obraz PBM wysłany!" : "Błąd podczas wysyłania.");
-    } catch (err) {
-      console.error(err);
-      setStatus("Błąd podczas przetwarzania.");
-    }
-  };
 
   const handleSendImage = async () => {
     if (imageFile) await sendBlob(imageFile);
@@ -95,6 +124,51 @@ function App() {
 
   return (
     <div className="container">
+      {uploadProgress && (
+  <div
+  style={{
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+  }}
+>
+  <div
+    style={{
+      background: "#ffffff",
+      color: "#000000",
+      padding: 20,
+      borderRadius: 8,
+      width: "80%",
+      maxWidth: 300,
+      textAlign: "center",
+    }}
+  >
+    {uploadProgress.error ? (
+      <>
+        <p style={{ marginBottom: 10, color: "red" }}>Błąd przetwarzania</p>
+        <button onClick={() => setUploadProgress(null)}>Zamknij</button>
+      </>
+    ) : (
+      <>
+        <p style={{ marginBottom: 10 }}>
+          {uploadProgress.percent < 100
+            ? `Wysyłanie... ${uploadProgress.percent}%`
+            : "Zakończono!"}
+        </p>
+        {uploadProgress.percent < 100 ? (
+          <progress value={uploadProgress.percent} max={100} style={{ width: "100%" }} />
+        ) : (
+          <button onClick={() => setUploadProgress(null)}>Zamknij</button>
+        )}
+      </>
+    )}
+  </div>
+</div>
+    )}
       <h1>Inteligentna Etykieta</h1>
 
       {/* Upload & convert */}
@@ -177,8 +251,6 @@ function App() {
     </button>
   </div>
 </details>
-
-      <p style={{ marginTop: 20 }}>{status}</p>
     </div>
   );
 }
