@@ -23,8 +23,6 @@ export default function TextEditor({ onSend }) {
   };
 
   return (
-    <details className="card">
-      <summary>Edytor tekstowy</summary>
       <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <label style={{ marginBottom: 5 }}>Rozmiar czcionki: {fontSize}px</label>
         <input
@@ -51,6 +49,5 @@ export default function TextEditor({ onSend }) {
         />
         <button onClick={send}>Wyślij</button>
       </div>
-    </details>
   );
 }

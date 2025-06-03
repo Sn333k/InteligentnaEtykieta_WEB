@@ -26,8 +26,6 @@ export default function PaintEditor({ onSend }) {
   };
 
   return (
-    <details className="card">
-      <summary>Narysuj</summary>
       <div>
         <canvas
           ref={canvasRef}
@@ -46,6 +44,5 @@ export default function PaintEditor({ onSend }) {
           <button onClick={send}>Wyślij</button>
         </div>
       </div>
-    </details>
   );
 }
