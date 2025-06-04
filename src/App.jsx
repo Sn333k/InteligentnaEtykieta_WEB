@@ -11,7 +11,7 @@ import logo from "./logoDUZE.png";
 
 export default function App() {
   const { progress, sendBlob, close } = useUploader();
-  const [openPanel, setOpenPanel] = useState(null); // "upload" | "paint" | "text"
+  const [openPanel, setOpenPanel] = useState(null);
 
   const togglePanel = (name) => {
     setOpenPanel(openPanel === name ? null : name);
