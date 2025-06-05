@@ -1,23 +1,25 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { convertCanvasToBlob } from "../utils/canvasUtils";
 
 export default function PaintEditor({ onSend }) {
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
+  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+  const [drawColor, setDrawColor] = useState('#000000');
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-
-    ctx.fillStyle = "#FFFFFF"; // białe tło
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }, []);
+  }, [backgroundColor]);
+
 
   const draw = (x, y) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = drawColor;
     ctx.beginPath();
     ctx.arc(x - rect.left, y - rect.top, 2, 0, Math.PI * 2);
     ctx.fill();
@@ -26,13 +28,18 @@ export default function PaintEditor({ onSend }) {
   const clear = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
   const send = async () => {
     const blob = await convertCanvasToBlob(canvasRef.current);
     onSend(blob);
+  };
+
+    const toggleColors = () => {
+    setBackgroundColor((prev) => (prev === '#FFFFFF' ? '#000000' : '#FFFFFF'));
+    setDrawColor((prev) => (prev === '#000000' ? '#FFFFFF' : '#000000'));
   };
 
   return (
@@ -52,7 +59,9 @@ export default function PaintEditor({ onSend }) {
         />
         <div>
           <button onClick={clear}>Wyczyść</button>
+          <button onClick={toggleColors}>Zamień kolor tła</button>
           <button onClick={send}><span>Wyślij</span></button>
+          
         </div>
       </div>
   );
