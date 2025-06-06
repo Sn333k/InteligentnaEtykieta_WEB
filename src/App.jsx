@@ -6,10 +6,12 @@ import UploadCard from "./components/UploadCard";
 import PaintEditor from "./components/PaintEditor";
 import TextEditor from "./components/TextEditor";
 import AccordionCard from "./components/AccordionCard";
+import logo from "./logoDUZE.png";
+
 
 export default function App() {
   const { progress, sendBlob, close } = useUploader();
-  const [openPanel, setOpenPanel] = useState(null); // "upload" | "paint" | "text"
+  const [openPanel, setOpenPanel] = useState(null);
 
   const togglePanel = (name) => {
     setOpenPanel(openPanel === name ? null : name);
@@ -18,6 +20,7 @@ export default function App() {
   return (
     <div className="container">
       <ProgressModal progress={progress} onClose={close} />
+      <img src={logo} alt="Logo" className="logo" />
       <h1>Inteligentna Etykieta</h1>
 
       <AccordionCard
