@@ -17,6 +17,7 @@ serve -s build -l 3000
 And you have a web server under IP addr: 'Your IP':3000
 
 **How to Use**
+
 Power on the ESP8266 — it creates a Wi-Fi AP named epaper-ap with password epaper123
 
 Connect your device (e.g., phone/laptop) to the AP
